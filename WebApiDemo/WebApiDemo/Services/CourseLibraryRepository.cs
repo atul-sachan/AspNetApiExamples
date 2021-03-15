@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using WebApiDemo.DbContexts;
 using WebApiDemo.Entities;
+using WebApiDemo.ResourceParameters;
 
 namespace WebApiDemo.Services
 {
@@ -121,6 +122,39 @@ namespace WebApiDemo.Services
         public IEnumerable<Author> GetAuthors()
         {
             return _context.Authors.ToList<Author>();
+        }
+
+        public IEnumerable<Author> GetAuthors(AuthorsResourceParameters authorsResourceParameters)
+        {
+            if (authorsResourceParameters == null)
+            {
+                throw new ArgumentNullException(nameof(authorsResourceParameters));
+            }
+
+            if (string.IsNullOrWhiteSpace(authorsResourceParameters.MainCategory)
+                 && string.IsNullOrWhiteSpace(authorsResourceParameters.SearchQuery))
+            {
+                return GetAuthors();
+            }
+
+            var collection = _context.Authors as IQueryable<Author>;
+
+            if (!string.IsNullOrWhiteSpace(authorsResourceParameters.MainCategory))
+            {
+                var mainCategory = authorsResourceParameters.MainCategory.Trim();
+                collection = collection.Where(a => a.MainCategory == mainCategory);
+            }
+
+            if (!string.IsNullOrWhiteSpace(authorsResourceParameters.SearchQuery))
+            {
+
+                var searchQuery = authorsResourceParameters.SearchQuery.Trim();
+                collection = collection.Where(a => a.MainCategory.Contains(searchQuery)
+                    || a.FirstName.Contains(searchQuery)
+                    || a.LastName.Contains(searchQuery));
+            }
+
+            return collection.ToList();
         }
 
         public IEnumerable<Author> GetAuthors(IEnumerable<Guid> authorIds)

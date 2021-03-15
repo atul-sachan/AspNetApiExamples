@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WebApiDemo.Entities;
+using WebApiDemo.ResourceParameters;
 
 namespace WebApiDemo.Services
 {
@@ -14,6 +15,7 @@ namespace WebApiDemo.Services
         void UpdateCourse(Course course);
         void DeleteCourse(Course course);
         IEnumerable<Author> GetAuthors();
+        IEnumerable<Author> GetAuthors(AuthorsResourceParameters authorsResourceParameters);
         Author GetAuthor(Guid authorId);
         IEnumerable<Author> GetAuthors(IEnumerable<Guid> authorIds);
         void AddAuthor(Author author);
