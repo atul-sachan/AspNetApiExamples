@@ -19,13 +19,13 @@ namespace CoreCodeCamp.Data
       _logger = logger;
     }
 
-    public void Add<T>(T entity) where T : class 
+    public void Add<T>(T entity) where T : class
     {
       _logger.LogInformation($"Adding an object of type {entity.GetType()} to the context.");
       _context.Add(entity);
     }
 
-    public void Delete<T>(T entity) where T: class
+    public void Delete<T>(T entity) where T : class
     {
       _logger.LogInformation($"Removing an object of type {entity.GetType()} to the context.");
       _context.Remove(entity);

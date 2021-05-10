@@ -24,6 +24,5 @@ namespace CoreCodeCamp.Data
     Task<Speaker[]> GetSpeakersByMonikerAsync(string moniker);
     Task<Speaker> GetSpeakerAsync(int speakerId);
     Task<Speaker[]> GetAllSpeakersAsync();
-
   }
 }
