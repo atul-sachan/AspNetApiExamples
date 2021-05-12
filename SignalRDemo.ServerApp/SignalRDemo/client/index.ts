@@ -54,32 +54,104 @@
 
 /************************************************************************************/
 
+// import * as signalR from "@microsoft/signalr";
+
+// let btn = document.getElementById("incrementView");
+// let viewCountSpan = document.getElementById("viewCount");
+
+// // create connection
+// let connection = new signalR.HubConnectionBuilder()
+//     .withUrl("/hub/view")
+//     .build();
+
+// btn.addEventListener("click", function (evt) {
+//     // send to hub
+//     connection.invoke("IncrementServerView");
+// });
+
+// // client events
+// connection.on("incrementView", (val) => {
+//     viewCountSpan.innerText = val;
+
+//     if (val % 10 === 0) connection.off("incrementView");
+// });
+
+// // start the connection
+// function startSuccess() {
+//     console.log("Connected.");
+//     connection.invoke("IncrementServerView");
+// }
+// function startFail() {
+//     console.log("Connection failed.");
+// }
+
+// connection.start().then(startSuccess, startFail);
+
+/************************************************************************************/
+// import * as signalR from "@microsoft/signalr";
+
+// let btnJoinYellow = document.getElementById("btnJoinYellow");
+// let btnJoinBlue = document.getElementById("btnJoinBlue");
+// let btnJoinOrange = document.getElementById("btnJoinOrange");
+// let btnTriggerYellow = document.getElementById("btnTriggerYellow");
+// let btnTriggerBlue = document.getElementById("btnTriggerBlue");
+// let btnTriggerOrange = document.getElementById("btnTriggerOrange");
+
+// // create connection
+// let connection = new signalR.HubConnectionBuilder()
+//     .withUrl("/hub/color")
+//     .build();
+
+// btnJoinYellow.addEventListener("click", () => { connection.invoke("JoinGroup", "Yellow"); });
+// btnJoinBlue.addEventListener("click", () => { connection.invoke("JoinGroup", "Blue"); });
+// btnJoinOrange.addEventListener("click", () => { connection.invoke("JoinGroup", "Orange"); });
+
+// btnTriggerYellow.addEventListener("click", () => { connection.invoke("TriggerGroup", "Yellow"); });
+// btnTriggerBlue.addEventListener("click", () => { connection.invoke("TriggerGroup", "Blue"); });
+// btnTriggerOrange.addEventListener("click", () => { connection.invoke("TriggerGroup", "Orange"); });
+
+// // client events
+// connection.on("triggerColor", (color) => {
+//     document.getElementsByTagName("body")[0].style.backgroundColor = color;
+// });
+
+// // start the connection
+// function startSuccess() {
+//     console.log("Connected.");
+//     //connection.invoke("IncrementServerView");
+// }
+// function startFail() {
+//     console.log("Connection failed.");
+// }
+
+// connection.start().then(startSuccess, startFail);
+
+
+/************************************************************************************/
+
 import * as signalR from "@microsoft/signalr";
 
-let btn = document.getElementById("incrementView");
-let viewCountSpan = document.getElementById("viewCount");
+let pieVotes = document.getElementById("pieVotes");
+let baconVotes = document.getElementById("baconVotes");
 
 // create connection
 let connection = new signalR.HubConnectionBuilder()
-    .withUrl("/hub/view")
+    .withUrl("/hub/vote")
     .build();
 
-btn.addEventListener("click", function (evt) {
-    // send to hub
-    connection.invoke("IncrementServerView");
-});
-
 // client events
-connection.on("incrementView", (val) => {
-    viewCountSpan.innerText = val;
-
-    if (val % 10 === 0) connection.off("incrementView");
+connection.on("updateVotes", (votes) => {
+    pieVotes.innerText = votes.pie;
+    baconVotes.innerText = votes.bacon;
 });
 
 // start the connection
 function startSuccess() {
     console.log("Connected.");
-    connection.invoke("IncrementServerView");
+    connection.invoke("GetCurrentVotes").then((votes) => {
+        pieVotes.innerText = votes.pie;
+        baconVotes.innerText = votes.bacon;
+    });
 }
 function startFail() {
     console.log("Connection failed.");
