@@ -1,5 +1,6 @@
 ﻿import * as signalR from "@microsoft/signalr";
 import { CustomLogger } from "./custom-logger";
+import CustomRetryPolicy from "./custom-retry-policy";
 
 var counter = document.getElementById("viewCounter");
 
@@ -10,6 +11,8 @@ let connection = new signalR.HubConnectionBuilder()
     .withUrl("/hub/view", {
         transport: signalR.HttpTransportType.WebSockets | signalR.HttpTransportType.ServerSentEvents
     })
+    //.withAutomaticReconnect([0,10,30,60, 90]) // 0, 10 etc are time interval in second 
+    .withAutomaticReconnect(new CustomRetryPolicy())
     .build();
 
 // on view update message from client
