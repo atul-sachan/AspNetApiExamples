@@ -3,6 +3,8 @@ using BusinessApplication.TourManagement.Api.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
+using System.Linq;
 
 namespace BusinessApplication.TourManagement.Api
 {
@@ -33,6 +36,23 @@ namespace BusinessApplication.TourManagement.Api
             }).AddNewtonsoftJson(options=> {
                 options.SerializerSettings.DateParseHandling = DateParseHandling.DateTimeOffset;
                 options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+            });
+
+            services.Configure<MvcOptions>(config =>
+            {
+                var newtonsoftJsonOutputFormatter = config.OutputFormatters.OfType<NewtonsoftJsonOutputFormatter>()?.FirstOrDefault();
+                if(newtonsoftJsonOutputFormatter != null)
+                {
+                    newtonsoftJsonOutputFormatter.SupportedMediaTypes.Add("application/vnd.marvin.tour+json");
+                    newtonsoftJsonOutputFormatter.SupportedMediaTypes.Add("application/vnd.marvin.tourwithestimatedprofits+json");
+                }
+
+                var newtonsoftJsonInputFormatter = config.InputFormatters.OfType<NewtonsoftJsonInputFormatter>()?.FirstOrDefault();
+                if(newtonsoftJsonInputFormatter != null)
+                {
+                    newtonsoftJsonInputFormatter.SupportedMediaTypes.Add("application/vnd.marvin.tourforcreation+json");
+                    newtonsoftJsonInputFormatter.SupportedMediaTypes.Add("application/vnd.marvin.tourwithmanagerforcreation+json");
+                }
             });
 
             services.AddCors(options =>

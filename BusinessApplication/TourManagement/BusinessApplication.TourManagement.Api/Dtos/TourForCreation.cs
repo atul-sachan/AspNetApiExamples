@@ -5,10 +5,8 @@ using System.Threading.Tasks;
 
 namespace BusinessApplication.TourManagement.Api.Dtos
 {
-    public class Tour : TourAbstractBase
+    public class TourForCreation : TourAbstractBase
     {
-        public Guid TourId { get; set; }
-        public string Band { get; set; }
-        
+        public Guid BandId { get; set; }
     }
 }
