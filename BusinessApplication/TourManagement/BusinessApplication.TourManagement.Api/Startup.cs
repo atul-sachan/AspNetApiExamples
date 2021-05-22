@@ -45,6 +45,9 @@ namespace BusinessApplication.TourManagement.Api
                 {
                     newtonsoftJsonOutputFormatter.SupportedMediaTypes.Add("application/vnd.marvin.tour+json");
                     newtonsoftJsonOutputFormatter.SupportedMediaTypes.Add("application/vnd.marvin.tourwithestimatedprofits+json");
+                    newtonsoftJsonOutputFormatter.SupportedMediaTypes.Add("application/vnd.marvin.tourwithshows+json");
+                    newtonsoftJsonOutputFormatter.SupportedMediaTypes.Add("application/vnd.marvin.tourwithestimatedprofitsandshows+json");
+                    newtonsoftJsonOutputFormatter.SupportedMediaTypes.Add("application/vnd.marvin.showcollection+json");
                 }
 
                 var newtonsoftJsonInputFormatter = config.InputFormatters.OfType<NewtonsoftJsonInputFormatter>()?.FirstOrDefault();
@@ -52,6 +55,10 @@ namespace BusinessApplication.TourManagement.Api
                 {
                     newtonsoftJsonInputFormatter.SupportedMediaTypes.Add("application/vnd.marvin.tourforcreation+json");
                     newtonsoftJsonInputFormatter.SupportedMediaTypes.Add("application/vnd.marvin.tourwithmanagerforcreation+json");
+                    newtonsoftJsonInputFormatter.SupportedMediaTypes.Add("application/vnd.marvin.tourwithshowsforcreation+json");
+                    newtonsoftJsonInputFormatter.SupportedMediaTypes.Add("application/vnd.marvin.tourwithmanagerandshowsforcreation+json");
+                    newtonsoftJsonInputFormatter.SupportedMediaTypes.Add("application/vnd.marvin.showcollectionforcreation+json");
+                    newtonsoftJsonInputFormatter.SupportedMediaTypes.Add("application/json-patch+json");
                 }
             });
 

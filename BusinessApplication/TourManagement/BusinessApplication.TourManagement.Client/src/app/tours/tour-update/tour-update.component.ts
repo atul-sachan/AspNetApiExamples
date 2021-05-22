@@ -1,9 +1,12 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { compare } from 'fast-json-patch';
 import { Subscription } from 'rxjs';
+import { CustomValidators } from '../shared/custom-validators';
 import { MasterDataService } from '../shared/master-data.service';
+import { TourForUpdate } from '../shared/tour-for-update.model';
 import { Tour } from '../shared/tour.model';
 import { TourService } from '../shared/tour.service';
 
@@ -17,6 +20,7 @@ export class TourUpdateComponent implements OnInit, OnDestroy {
   tour: Tour;
   private tourId: string;
   private sub: Subscription;
+  private originalTourForUpdate: TourForUpdate;
 
   constructor(private masterDataService: MasterDataService,
     private tourService: TourService,
@@ -28,11 +32,11 @@ export class TourUpdateComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     // define the tourForm (with empty default values)
     this.tourForm = this.formBuilder.group({
-      title: [''],
-      description: [''],
-      startDate: [],
-      endDate: []
-    });
+      title: ['', [Validators.required, Validators.maxLength(200)]],
+      description: ['', [Validators.required, Validators.maxLength(2000)]],
+      startDate: [, Validators.required],
+      endDate: [, Validators.required]
+    }, { validator: CustomValidators.StartDateBeforeEndDateValidator });
 
     // get route data (tourId)
     this.sub = this.route.params.subscribe(
@@ -44,6 +48,12 @@ export class TourUpdateComponent implements OnInit, OnDestroy {
           .subscribe(tour => {
             this.tour = tour;
             this.updateTourForm();
+
+            this.originalTourForUpdate = automapper.map(
+              'TourFormModel',
+              'TourForUpdate',
+              this.tourForm.value);
+
           });
       }
     );
@@ -66,8 +76,25 @@ export class TourUpdateComponent implements OnInit, OnDestroy {
   }
 
   saveTour(): void {
-    if (this.tourForm.dirty) {
+    if (this.tourForm.dirty && this.tourForm.valid) {
       // TODO
+      // [
+      //   { op: "replace", path: "/description", value: "Updated description"}
+      //   {op: "replace", path: "/title", value: "Updated title"}
+      // ]
+
+      let changedTourForUpdate = automapper.map(
+        'TourFormModel',
+        'TourForUpdate',
+        this.tourForm.value);
+
+      let patchDocument = compare(this.originalTourForUpdate, changedTourForUpdate);
+
+      this.tourService.partiallyUpdateTour(this.tourId, patchDocument)
+        .subscribe(
+          () => {
+            this.router.navigateByUrl('/tours');
+          });
     }
   }
 }

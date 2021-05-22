@@ -35,7 +35,7 @@
               "node_modules/font-awesome/scss/font-awesome.scss",
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": ["node_modules/automapper-ts/dist/automapper.min.js"]
           },
           "configurations": {
             "production": {
@@ -130,7 +130,7 @@
     }
   },
   "defaultProject": "TourManagement",
-  "cli": {
+    "cli": {
     "analytics": "85ac0daa-571f-4b95-85e1-fa58a7eaad98"
   }
 }

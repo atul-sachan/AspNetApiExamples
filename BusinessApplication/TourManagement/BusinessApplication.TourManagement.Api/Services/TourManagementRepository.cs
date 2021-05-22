@@ -30,7 +30,7 @@ namespace BusinessApplication.TourManagement.Api.Services
             }
             else
             {
-                return await this.context.Tours.ToListAsync();
+                return await this.context.Tours.Include(x=> x.Band).ToListAsync();
             }
         }
 

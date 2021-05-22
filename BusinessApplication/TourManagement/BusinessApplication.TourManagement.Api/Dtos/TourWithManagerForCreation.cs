@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 namespace BusinessApplication.TourManagement.Api.Dtos
 {
-    public class TourWithManagerForCreation: TourForCreation
+    public class TourWithManagerForCreation : TourForCreation
     {
-        public Guid ManagerId { get; set; }
+        public string ManagerId { get; set; }
     }
 }

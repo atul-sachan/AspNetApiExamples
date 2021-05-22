@@ -27,19 +27,20 @@ export class TourDetailComponent implements OnInit, OnDestroy {
       params => {
         this.tourId = params['tourId'];
 
-        if (this.isAdmin) {
-          this.tourService.getTourWithEstimatedProfits(this.tourId)
-            .subscribe(tour => {
-              this.tour = tour;
-            });
-        } else {
-          this.tourService.getTour(this.tourId)
+        if (this.isAdmin === true) {
+          // get tour with estimated profits field 
+          this.tourService.getTourWithEstimatedProfitsAndShows(this.tourId)
             .subscribe(tour => {
               this.tour = tour;
             });
         }
-
-
+        else {
+          // get tour 
+          this.tourService.getTourWithShows(this.tourId)
+            .subscribe(tour => {
+              this.tour = tour;
+            });
+        }    
       }
     );
   }
