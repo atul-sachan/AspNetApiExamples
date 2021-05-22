@@ -9,7 +9,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessApplication.TourMan
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IDP", "IDP", "{D5513D04-BA27-4EF5-AD84-6251E3E64B87}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Marvin.IDP", "IDP\Marvin.IDP\Marvin.IDP.csproj", "{7D138FC7-0ECB-4389-AA08-FD899703214E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Marvin.IDP", "IDP\Marvin.IDP\Marvin.IDP.csproj", "{7D138FC7-0ECB-4389-AA08-FD899703214E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DatingApp", "DatingApp", "{39174F12-AC0F-471C-9300-FE8D03C53FBF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatingApp.Api", "DatingApp\DatingApp.Api\DatingApp.Api.csproj", "{A135F7CE-82E1-4158-911A-52FF3D7663CE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,6 +29,10 @@ Global
 		{7D138FC7-0ECB-4389-AA08-FD899703214E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7D138FC7-0ECB-4389-AA08-FD899703214E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7D138FC7-0ECB-4389-AA08-FD899703214E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A135F7CE-82E1-4158-911A-52FF3D7663CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A135F7CE-82E1-4158-911A-52FF3D7663CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A135F7CE-82E1-4158-911A-52FF3D7663CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A135F7CE-82E1-4158-911A-52FF3D7663CE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -32,6 +40,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{46A05BD1-23D8-4C0B-A153-8A60BF4011D1} = {9C03373B-CF17-4464-9C58-D33CB549D4B1}
 		{7D138FC7-0ECB-4389-AA08-FD899703214E} = {D5513D04-BA27-4EF5-AD84-6251E3E64B87}
+		{A135F7CE-82E1-4158-911A-52FF3D7663CE} = {39174F12-AC0F-471C-9300-FE8D03C53FBF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F4A75FB4-F27C-4B06-AEBA-3F7F69516558}
