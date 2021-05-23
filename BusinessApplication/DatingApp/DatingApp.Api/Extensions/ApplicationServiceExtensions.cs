@@ -16,6 +16,7 @@ namespace DatingApp.Api.Extensions
                 options.UseSqlServer(config.GetConnectionString("DefaultConnection"));
             });
             services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<IUserRepository, UserRepository>();
 
             return services;
         }
