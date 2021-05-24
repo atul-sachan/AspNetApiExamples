@@ -4,8 +4,8 @@ import { ToastrService } from 'ngx-toastr';
 
 import { Observable } from 'rxjs';
 
-import { AccountService } from '../services/account.service';
-import { User } from '../models/user.model';
+import { AccountService } from '../_services/account.service';
+import { User } from '../_models/user.model';
 
 
 
