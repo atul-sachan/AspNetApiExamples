@@ -13,7 +13,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Marvin.IDP", "IDP\Marvin.ID
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DatingApp", "DatingApp", "{39174F12-AC0F-471C-9300-FE8D03C53FBF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatingApp.Api", "DatingApp\DatingApp.Api\DatingApp.Api.csproj", "{A135F7CE-82E1-4158-911A-52FF3D7663CE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatingApp.Api", "DatingApp\DatingApp.Api\DatingApp.Api.csproj", "{A135F7CE-82E1-4158-911A-52FF3D7663CE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Notes", "Notes", "{CA452B19-CE75-47D7-A926-B6181AE88EB5}"
+	ProjectSection(SolutionItems) = preProject
+		index.html = index.html
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

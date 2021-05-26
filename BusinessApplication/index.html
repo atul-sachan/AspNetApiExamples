@@ -1,0 +1,646 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+</head>
+<body class="container">
+    <h3 id="filter-types" class="heading-anchor"><a class="anchor-link docon docon-link" href="#filter-types" aria-labelledby="filter-types"></a>Filter types</h3>
+    <p>Each filter type is executed at a different stage in the filter pipeline:</p>
+    <ul>
+        <li>
+            <p><a href="#authorization-filters" data-linktype="self-bookmark">Authorization filters</a> run first and are used to determine whether the user is authorized for the request. Authorization filters short-circuit the pipeline if the request is not authorized.</p>
+        </li>
+        <li>
+            <p><a href="#resource-filters" data-linktype="self-bookmark">Resource filters</a>:</p>
+            <ul>
+                <li>Run after authorization.</li>
+                <li><a href="/en-us/dotnet/api/microsoft.aspnetcore.mvc.filters.iresourcefilter.onresourceexecuting" data-linktype="absolute-path">OnResourceExecuting</a> runs code before the rest of the filter pipeline. For example, <code>OnResourceExecuting</code> runs code before model binding.</li>
+                <li><a href="/en-us/dotnet/api/microsoft.aspnetcore.mvc.filters.iresourcefilter.onresourceexecuted" data-linktype="absolute-path">OnResourceExecuted</a> runs code after the rest of the pipeline has completed.</li>
+            </ul>
+        </li>
+        <li>
+            <p><a href="#action-filters" data-linktype="self-bookmark">Action filters</a>:</p>
+            <ul>
+                <li>Run code immediately before and after an action method is called.</li>
+                <li>Can change the arguments passed into an action.</li>
+                <li>Can change the result returned from the action.</li>
+                <li>Are <strong>not</strong> supported in Razor Pages.</li>
+            </ul>
+        </li>
+        <li>
+            <p><a href="#exception-filters" data-linktype="self-bookmark">Exception filters</a> apply global policies to unhandled exceptions that occur before the response body has been written to.</p>
+        </li>
+        <li>
+            <p><a href="#result-filters" data-linktype="self-bookmark">Result filters</a> run code immediately before and after the execution of action results. They run only when the action method has executed successfully. They are useful for logic that must surround view or formatter execution.</p>
+        </li>
+    </ul>
+
+    <p><strong>Synchronous filters run code before and after their pipeline stage.  Asynchronous filters define an On-Stage-ExecutionAsync method.</strong></p>
+    <div class="card" style="margin-bottom:10px;">
+        <div class="card-header" id="code-try-1" data-bi-name="code-header">
+            <span class="language">Authorization filters Example</span>
+        </div>
+        <div class="card-body">
+            <h6 class="font-weight-bold">Example 1</h6>
+            <pre>
+    public class SpecialAuthorizeFilter : IAuthorizationFilter
+    {
+        private const string HEADER_SPECIAL_STUFF = "specialHeaderStuff";
+        public void OnAuthorization(AuthorizationFilterContext context)
+        {
+            var authCode = context.HttpContext.Request.Headers[HEADER_SPECIAL_STUFF];
+            // Write your logic here.
+            if (string.IsNullOrEmpty(authCode))
+            {
+                context.Result = new UnauthorizedObjectResult($"{HEADER_SPECIAL_STUFF} is required");
+                return;
+            }
+            if (!authCode.Equals("IAmValid"))
+            {
+                context.Result = new UnauthorizedObjectResult($"{HEADER_SPECIAL_STUFF} is invalid");
+                return;
+            }
+            // ===== if you're here, it's a success =====
+            // DO STUFF
+            //
+            // ===== you can also use registered services =====
+            // var someService = context.HttpContext.RequestServices.GetService<ISomeService>();
+        }
+    }
+            </pre>
+            <hr />
+            <h6 class="font-weight-bold">Example 2</h6>
+            <pre>
+    public class SpecialAuthorizeFilter : IAsyncAuthorizationFilter
+    {
+        private const string HEADER_SPECIAL_STUFF = "specialHeaderStuff";
+        public Task OnAuthorizationAsync(AuthorizationFilterContext context)
+        {
+            var authCode = context.HttpContext.Request.Headers[HEADER_SPECIAL_STUFF];
+            // Write your logic here.
+            if (string.IsNullOrEmpty(authCode))
+            {
+                context.Result = new UnauthorizedObjectResult($"{HEADER_SPECIAL_STUFF} is required");
+                return Task.CompletedTask;
+            }
+            if (!authCode.Equals("IAmValid"))
+            {
+                context.Result = new UnauthorizedObjectResult($"{HEADER_SPECIAL_STUFF} is invalid");
+                return Task.CompletedTask;
+            }
+            // ===== if you're here, it's a success =====
+            // DO STUFF
+            //
+            // ===== you can also use registered services =====
+            // var someService = context.HttpContext.RequestServices.GetService<ISomeService>();
+            return Task.CompletedTask;
+        }
+    }
+            </pre>
+        </div>
+    </div>
+
+    <div class="card" style="margin-bottom:10px;">
+        <div class="card-header" id="code-try-1" data-bi-name="code-header">
+            <span class="language">Resource filters Example</span>
+        </div>
+        <div class="card-body">
+            <ul>
+                <li class="font-weight-bold">
+                    ResourceFilterAttribute
+                    <ul>
+                        <li class="font-weight-normal"> OnResourceExecuting </li>
+                        <li class="font-weight-normal"> OnResourceExecuted  </li>
+                        <li class="font-weight-normal"> OnResourceExecutionAsync</li>
+                    </ul>
+                </li>
+                <li class="font-weight-bold">
+                    IResultFilter
+                    <ul>
+                        <li class="font-weight-normal"> OnResourceExecuting </li>
+                        <li class="font-weight-normal"> OnResourceExecuted  </li>
+                    </ul>
+                </li>
+                <li class="font-weight-bold">
+                    IAsyncResultFilter
+                    <ul>
+                        <li class="font-weight-normal">OnResourceExecutionAsync</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body">
+            <h6><strong>Example 1</strong></h6>
+            <pre>
+    public class CustomResourceFilter : IResourceFilter
+    {
+        private readonly string[] _headers;
+
+        public CustomResourceFilter(params string[] headers)
+        {
+            _headers = headers;
+        }
+        public void OnResourceExecuted(ResourceExecutedContext context)
+        {
+
+        }
+
+        public void OnResourceExecuting(ResourceExecutingContext context)
+        {
+            if (_headers == null) return;
+
+            if (!_headers.All(m => context.HttpContext.Request.Headers.ContainsKey(m)))
+            {
+                context.Result = new JsonResult(new { Error = "Headers Missing" }){ 
+                    StatusCode = 400 
+                };
+            }
+        }
+    }
+            </pre>
+            <hr />
+            <h6><strong>Example 2</strong></h6>
+            <pre>
+    public class CustomAsyncResourceFilter : IAsyncResourceFilter
+    {
+        private readonly string[] _headers;
+
+        public CustomAsyncResourceFilter(params string[] headers)
+        {
+            _headers = headers;
+        }
+        public async Task OnResourceExecutionAsync(ResourceExecutingContext context, ResourceExecutionDelegate next)
+        {
+            if (_headers == null) return;
+
+            if (!_headers.All(m => context.HttpContext.Request.Headers.ContainsKey(m)))
+            {
+                context.Result = new JsonResult(new { Error = "Headers Missing" }){ 
+                    StatusCode = 400 
+                };
+                
+                return;
+            }
+            ResourceExecutedContext executedContext = await next();
+
+        }
+    }
+
+            </pre>
+            <hr />
+            <h6><strong>Example 3</strong></h6>
+            <pre>
+    public class CustomResourceFilterAttribute : ResourceFilterAttribute
+    {
+        private readonly string[] _headers;
+
+        public CustomResourceFilter(params string[] headers)
+        {
+            _headers = headers;
+        }
+        public void OnResourceExecuted(ResourceExecutedContext context)
+        {
+
+        }
+
+        public void OnResourceExecuting(ResourceExecutingContext context)
+        {
+            if (_headers == null) return;
+
+            if (!_headers.All(m => context.HttpContext.Request.Headers.ContainsKey(m)))
+            {
+                context.Result = new JsonResult(new { Error = "Headers Missing" }){ 
+                    StatusCode = 400 
+                };
+            }
+        }
+
+	    public async Task OnResourceExecutionAsync(ResourceExecutingContext context, ResourceExecutionDelegate next)
+        {
+            if (_headers == null) return;
+
+            if (!_headers.All(m => context.HttpContext.Request.Headers.ContainsKey(m)))
+            {
+                context.Result = new JsonResult(new { Error = "Headers Missing" }){ 
+                    StatusCode = 400 
+                };
+                
+                return;
+            }
+            ResourceExecutedContext executedContext = await next();
+
+        }
+    }
+
+            </pre>
+            <hr />
+        </div>
+    </div>
+
+    <div class="card" style="margin-bottom:10px;">
+        <div class="card-header" id="code-try-1" data-bi-name="code-header">
+            <span class="language">Action filters Example</span>
+        </div>
+        <div class="card-body">
+            <ul>
+                <li class="font-weight-bold">
+                    ActionFilterAttribute
+                    <ul>
+                        <li class="font-weight-normal"> OnActionExecuting </li>
+                        <li class="font-weight-normal"> OnActionExecuted  </li>
+                        <li class="font-weight-normal"> OnActionExecutionAsync</li>
+                    </ul>
+                </li>
+                <li class="font-weight-bold">
+                    IActionFilter
+                    <ul>
+                        <li class="font-weight-normal"> OnActionExecuting </li>
+                        <li class="font-weight-normal"> OnActionExecuted  </li>
+                    </ul>
+                </li>
+                <li class="font-weight-bold">
+                    IAsyncActionFilter
+                    <ul>
+                        <li class="font-weight-normal">OnActionExecutionAsync</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body">
+            <h6><strong>Example 1</strong></h6>
+
+            <pre>
+    public class ValidateModelFilterAttribute : ActionFilterAttribute
+    {
+        public override void OnActionExecuting(ActionExecutingContext context)
+        {
+            if (!context.ModelState.IsValid)
+            {
+                context.Result = new BadRequestObjectResult(context.ModelState);
+            }
+        }
+
+        public override void OnActionExecuted(ActionExecutedContext context)
+        {
+            var result = context.Result;
+            // Do something with Result.
+            if (context.Canceled == true)
+            {
+                // Action execution was short-circuited by another filter.
+            }
+
+            if(context.Exception != null)
+            {
+                // Exception thrown by action or action filter.
+                // Set to null to handle the exception.
+                context.Exception = null;
+            }
+        }
+    
+        public async Task OnActionExecutionAsync(ActionExecutingContext context,  ActionExecutionDelegate next)
+        {
+            // Do something before the action executes.
+            if (!context.ModelState.IsValid)
+            {
+                context.Result = new BadRequestObjectResult(context.ModelState);
+            }
+            // next() calls the action method.
+            ActionExecutedContext resultContext = await next(); 
+            // resultContext.Result is set.
+
+            // Do something after the action executes.
+            if (resultContext.Canceled == true)
+            {
+                // Action execution was short-circuited by another filter.
+            }
+
+            if(resultContext.Exception != null)
+            {
+                // Exception thrown by action or action filter.
+                // Set to null to handle the exception.
+                context.Exception = null;
+            }
+        }
+    }
+            </pre>
+            <hr />
+            <h6><strong>Example 2</strong></h6>
+            <pre>
+    public class ValidateModelFilter : IAsyncActionFilter
+    {
+        public async Task OnActionExecutionAsync(ActionExecutingContext context,  ActionExecutionDelegate next)
+        {
+            // Do something before the action executes.
+            if (!context.ModelState.IsValid)
+            {
+                context.Result = new BadRequestObjectResult(context.ModelState);
+            }
+            // next() calls the action method.
+            ActionExecutedContext resultContext = await next(); 
+            // resultContext.Result is set.
+
+            // Do something after the action executes.
+            if (resultContext.Canceled == true)
+            {
+                // Action execution was short-circuited by another filter.
+            }
+
+            if(resultContext.Exception != null)
+            {
+                // Exception thrown by action or action filter.
+                // Set to null to handle the exception.
+                context.Exception = null;
+            }
+        }
+    }
+            </pre>
+            <hr />
+            <h6><strong>Example 3</strong></h6>
+            <pre>
+    public class ValidateModelFilter : IActionFilter
+    {
+        public void OnActionExecuting(ActionExecutingContext context)
+        {
+            if (!context.ModelState.IsValid)
+            {
+                context.Result = new BadRequestObjectResult(context.ModelState);
+            }
+        }
+
+        public void OnActionExecuted(ActionExecutedContext context)
+        {
+            var result = context.Result;
+            // Do something with Result.
+            if (context.Canceled == true)
+            {
+                // Action execution was short-circuited by another filter.
+            }
+
+            if(context.Exception != null)
+            {
+                // Exception thrown by action or action filter.
+                // Set to null to handle the exception.
+                context.Exception = null;
+            }
+        }
+    }
+            </pre>
+        </div>
+
+    </div>
+
+    <div class="card" style="margin-bottom:10px;">
+        <div class="card-header" id="code-try-1" data-bi-name="code-header">
+            <span class="language">Exception filters Example</span>
+        </div>
+        <div class="card-body">
+            <ul>
+                <li class="font-weight-bold">
+                    ExceptionFilterAttribute
+                    <ul>
+                        <li class="font-weight-normal"> OnException </li>
+                        <li class="font-weight-normal"> OnExceptionAsync</li>
+                    </ul>
+                </li>
+                <li class="font-weight-bold">
+                    IExceptionFilter
+                    <ul>
+                        <li class="font-weight-normal"> OnException </li>
+                    </ul>
+                </li>
+                <li class="font-weight-bold">
+                    IAsyncExceptionFilter
+                    <ul>
+                        <li class="font-weight-normal"> OnExceptionAsync</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body">
+            <pre>
+    public class CustomExceptionFilter : IExceptionFilter
+    {
+        private readonly IWebHostEnvironment _hostingEnvironment;
+        private readonly IModelMetadataProvider _modelMetadataProvider;
+
+        public CustomExceptionFilter(IWebHostEnvironment hostingEnvironment, IModelMetadataProvider modelMetadataProvider)
+        {
+            _hostingEnvironment = hostingEnvironment;
+            _modelMetadataProvider = modelMetadataProvider;
+        }
+
+        public void OnException(ExceptionContext context)
+        {
+            if (!_hostingEnvironment.IsDevelopment())
+            {
+                return;
+            }
+            var result = new ViewResult {ViewName = "CustomError"};
+            result.ViewData = new ViewDataDictionary(_modelMetadataProvider, context.ModelState);
+            result.ViewData.Add("Exception", context.Exception);
+            // TODO: Pass additional detailed data via ViewData
+            context.Result = result;
+        }
+    }
+            </pre>
+            <pre>
+    public class CustomExceptionFilter : IAsyncExceptionFilter
+    {
+        private readonly IWebHostEnvironment _hostingEnvironment;
+        private readonly IModelMetadataProvider _modelMetadataProvider;
+
+        public CustomExceptionFilter(
+            IWebHostEnvironment hostingEnvironment,
+            IModelMetadataProvider modelMetadataProvider)
+        {
+            _hostingEnvironment = hostingEnvironment;
+            _modelMetadataProvider = modelMetadataProvider;
+        }
+
+        public Task OnExceptionAsync(ExceptionContext context)
+        {
+            if (!_hostingEnvironment.IsDevelopment())
+            {
+                return;
+            }
+            var result = new ViewResult {ViewName = "CustomError"};
+            result.ViewData = new ViewDataDictionary(_modelMetadataProvider,
+                                                        context.ModelState);
+            result.ViewData.Add("Exception", context.Exception);
+            // TODO: Pass additional detailed data via ViewData
+            context.Result = result;
+            return Task.CompletedTask;
+        }
+    }</pre>
+
+        </div>
+    </div>
+
+    <div class="card" style="margin-bottom:10px;">
+        <div class="card-header" id="code-try-1" data-bi-name="code-header">
+            <span class="language">Result filters Example</span>
+        </div>
+        <div class="card-body">
+            <ul>
+                <li class="font-weight-bold">
+                    ResultFilterAttribute
+                    <ul>
+                        <li class="font-weight-normal"> OnResultExecuting </li>
+                        <li class="font-weight-normal"> OnResultExecuted  </li>
+                        <li class="font-weight-normal">OnResultExecutionAsync</li>
+                    </ul>
+                </li>
+                <li class="font-weight-bold">
+                    IResultFilter
+                    <ul>
+                        <li class="font-weight-normal"> OnResultExecuting </li>
+                        <li class="font-weight-normal"> OnResultExecuted  </li>
+                    </ul>
+                </li>
+                <li class="font-weight-bold">
+                    IAsyncResultFilter
+                    <ul>
+                        <li class="font-weight-normal">OnResultExecutionAsync</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body">
+            <h6 class="font-weight-bold">Example 1</h6>
+            <pre>
+    public class AddHeaderResultServiceFilterAttribute : ResultFilterAttribute
+    {
+        private ILogger _logger;
+        public AddHeaderResultServiceFilter(ILoggerFactory loggerFactory)
+        {
+            _logger = loggerFactory.CreateLogger<AddHeaderResultServiceFilter>();
+        }
+
+        public override void OnResultExecuting(ResultExecutingContext context)
+        {
+            var headerName = "OnResultExecuting";
+            context.HttpContext.Response.Headers.Add(headerName, new string[] { "ResultExecutingSuccessfully" });
+            _logger.LogInformation("Header added: {HeaderName}", headerName);
+        }
+
+        public override void OnResultExecuted(ResultExecutedContext context)
+        {
+            // Can't add to headers here because response has started.
+            if (context.Exception != null)
+            {
+                context.ExceptionHandled = true;
+                context.Canceled = true;
+            }
+            _logger.LogInformation("AddHeaderResultServiceFilter.OnResultExecuted");
+        }
+        public override async Task OnResultExecutionAsync(ResultExecutingContext context, ResultExecutionDelegate next)
+        {
+            // Do something before the action executes.
+            var headerName = "MyPageHeader";
+            context.HttpContext.Response.Headers.Add(headerName, new string[] { "MyPageHeader" });
+            // next() calls the action method.
+
+            ResultExecutedContext resultContext = await next();
+            // resultContext.Result is set.
+            
+            // Do something after the action executes.
+            if (resultContext.Exception != null)
+            {
+                resultContext.ExceptionHandled = true;
+                resultContext.Canceled = true;
+            }
+        }
+    }
+            </pre>
+            <hr />
+            <h6 class="font-weight-bold">Example 2</h6>
+            <pre>
+    public class AddHeaderResultServiceFilter : IResultFilter
+    {
+        private ILogger _logger;
+        public AddHeaderResultServiceFilter(ILoggerFactory loggerFactory)
+        {
+            _logger = loggerFactory.CreateLogger<AddHeaderResultServiceFilter>();
+        }
+
+        public override void OnResultExecuting(ResultExecutingContext context)
+        {
+            var headerName = "OnResultExecuting";
+            context.HttpContext.Response.Headers.Add(headerName, new string[] { "ResultExecutingSuccessfully" });
+            _logger.LogInformation("Header added: {HeaderName}", headerName);
+        }
+
+        public override void OnResultExecuted(ResultExecutedContext context)
+        {
+            // Can't add to headers here because response has started.
+            if (context.Exception != null)
+            {
+                context.ExceptionHandled = true;
+                context.Canceled = true;
+            }
+            _logger.LogInformation("AddHeaderResultServiceFilter.OnResultExecuted");
+        }
+    }
+            </pre>
+            <hr />
+            <h6 class="font-weight-bold">Example 3</h6>
+            <pre>
+    public class AddHeaderResultServiceFilter : IAsyncResultFilter
+    {
+        private ILogger _logger;
+        public AddHeaderResultServiceFilter(ILoggerFactory loggerFactory)
+        {
+            _logger = loggerFactory.CreateLogger<AddHeaderResultServiceFilter>();
+        }
+        
+        public override async Task OnResultExecutionAsync(ResultExecutingContext context, ResultExecutionDelegate next)
+        {
+            // Do something before the action executes.
+            var headerName = "MyPageHeader";
+            context.HttpContext.Response.Headers.Add(headerName, new string[] { "MyPageHeader" });
+            // next() calls the action method.
+
+            ResultExecutedContext resultContext = await next();
+            // resultContext.Result is set.
+            
+            // Do something after the action executes.
+            if (resultContext.Exception != null)
+            {
+                resultContext.ExceptionHandled = true;
+                resultContext.Canceled = true;
+            }
+        }
+    }
+            </pre>
+        </div>
+    </div>
+
+    <br />
+    <br />
+    <br />
+    <br />
+
+    <div class="card">
+        <div class="card-header" id="code-try-1" data-bi-name="code-header">
+            <span class="language">A global filter is added in StartUp.ConfigureServices:</span>
+        </div>
+        <div class="card-body">
+            <pre>
+    public void ConfigureServices(IServiceCollection services)
+    {
+        services.AddControllersWithViews(options=>
+        {
+            options.Filters.Add(typeof(MySampleActionFilter));
+        });
+    }
+            </pre>
+        </div>
+    </div>
+
+    <p>For More https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/mvc/controllers/filters/3.1sample/FiltersSample/Filters</p>
+
+</body>
+</html>

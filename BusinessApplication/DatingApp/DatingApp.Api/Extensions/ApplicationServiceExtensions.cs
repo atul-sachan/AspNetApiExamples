@@ -20,6 +20,7 @@ namespace DatingApp.Api.Extensions
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IPhotoService, PhotoService>();
             services.Configure<CloudinarySettings>(config.GetSection("CloudinarySettings"));
+            services.AddScoped<LogUserActivity>();
             return services;
         }
     }

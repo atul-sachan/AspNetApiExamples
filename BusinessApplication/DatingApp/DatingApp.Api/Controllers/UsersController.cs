@@ -2,6 +2,7 @@
 using DatingApp.Api.Data;
 using DatingApp.Api.Dtos;
 using DatingApp.Api.Extensions;
+using DatingApp.Api.Helpers;
 using DatingApp.Api.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -32,11 +33,26 @@ namespace DatingApp.Api.Controllers
             this.userRepository = userRepository;
         }
 
+        //[HttpGet]
+        //public async Task<IActionResult> GetUsers()
+        //{
+        //    var users = await userRepository.GetUserAsync();
+        //    return Ok(mapper.Map<IEnumerable<MemberDto>>(users));
+        //}
+
         [HttpGet]
-        public async Task<IActionResult> GetUsers()
+        public async Task<IActionResult> GetUsers([FromQuery]UserParams userParams)
         {
-            var users = await userRepository.GetUserAsync();
-            return Ok(mapper.Map<IEnumerable<MemberDto>>(users));
+            var user = await userRepository.GetUserByUserNameAsync(User.GetUserName());
+            userParams.CurrentUsername = user.UserName;
+            if (string.IsNullOrEmpty(userParams.Gender))
+            {
+                userParams.Gender = user.Gender == "male"? "female": "male";
+            }
+
+            var users = await userRepository.GetMembersAsync(userParams);
+            Response.AddPaginationHeader(users.CurrentPage, users.PageSize, users.TotalCount, users.TotalPages);
+            return Ok(users);
         }
 
         // [HttpGet("{id}")]
