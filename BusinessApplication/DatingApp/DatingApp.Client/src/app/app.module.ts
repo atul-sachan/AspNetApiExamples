@@ -1,3 +1,4 @@
+import { MemberMessagesComponent } from './members/member-messages/member-messages.component';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
@@ -41,6 +42,7 @@ import { DateInputComponent } from './_forms/date-input/date-input.component';
     ServerErrorComponent,
     MemberCardComponent,
     MemberEditComponent,
+    MemberMessagesComponent,
     PhotoEditorComponent,
     TextInputComponent,
     DateInputComponent
