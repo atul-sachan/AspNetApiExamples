@@ -58,8 +58,7 @@ namespace DatingApp.Api.Data
 
         }
 
-        public async Task<IEnumerable<MessageDto>> GetMessageThread(string currentUsername,
-            string recipientUsername)
+        public async Task<IEnumerable<MessageDto>> GetMessageThread(string currentUsername, string recipientUsername)
         {
             var messages = await context.Messages
                 .Include(u => u.Sender).ThenInclude(p => p.Photos)

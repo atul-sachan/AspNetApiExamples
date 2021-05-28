@@ -40,6 +40,7 @@ namespace DatingApp.Api.Controllers
         //    return Ok(mapper.Map<IEnumerable<MemberDto>>(users));
         //}
 
+        [Authorize(Roles = "Member")]
         [HttpGet]
         public async Task<IActionResult> GetUsers([FromQuery]UserParams userParams)
         {
@@ -62,6 +63,7 @@ namespace DatingApp.Api.Controllers
         //     return Ok(mapper.Map<MemberDto>(user));
         // }
 
+        [Authorize(Roles ="Member")]
         [HttpGet("{username}", Name = "GetUserNyName")]
         public async Task<IActionResult> GetUseByUserNamer(string username)
         {
