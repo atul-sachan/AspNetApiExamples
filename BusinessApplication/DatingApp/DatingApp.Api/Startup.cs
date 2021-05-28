@@ -1,6 +1,7 @@
 using System;
 using DatingApp.Api.Extensions;
 using DatingApp.Api.Middleware;
+using DatingApp.Api.SignalR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -28,7 +29,8 @@ namespace DatingApp.Api
             services.AddSwaggerServices(Configuration);
             services.AddApplicationServices(Configuration);
             services.AddIdentityServices(Configuration);
-            
+            services.AddSignalR();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -47,7 +49,11 @@ namespace DatingApp.Api
             app.UseHttpsRedirection();
 
             app.UseRouting();
-            app.UseCors(policy=> policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+            app.UseCors(policy=> policy
+                .AllowAnyHeader()
+                .AllowCredentials()
+                .AllowAnyMethod()
+                .WithOrigins("https://localhost:4200"));
             app.UseAuthentication();
             app.UseAuthorization();
             
@@ -55,6 +61,8 @@ namespace DatingApp.Api
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<PresenceHub>("hubs/presence");
+                endpoints.MapHub<MessageHub>("hubs/message");
             });
         }
     }
