@@ -19,6 +19,7 @@ using Microsoft.OpenApi.Models;
 using API.Extensions;
 using API.Middleware;
 using StackExchange.Redis;
+using Infrastructure.Identity;
 
 namespace API
 {
@@ -36,6 +37,10 @@ namespace API
         {
 
             services.AddControllers();
+            services.AddDbContext<AppIdentityDbContext>(x =>
+            {
+                x.UseSqlite(Configuration.GetConnectionString("IdentityConnection"));
+            });
             services.AddDbContext<StoreContext>(x =>
             {
                 x.UseSqlite(Configuration.GetConnectionString("DefaultConnection"));
@@ -47,6 +52,7 @@ namespace API
             });
             services.AddSwaggerDocumentation();
             services.AddApplicationServices();
+            services.AddIdentityServices(Configuration);
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
             services.AddCors(opt =>
             {
@@ -70,7 +76,8 @@ namespace API
             app.UseStaticFiles();
 
             app.UseCors("CorsPolicy");
-            
+
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

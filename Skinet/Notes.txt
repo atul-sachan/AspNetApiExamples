@@ -1,0 +1,1 @@
+dotnet ef migrations add <migration-Name> -p <DBContextLocationProject> -s <source-project> -c <dbcontextName> -o <location>
