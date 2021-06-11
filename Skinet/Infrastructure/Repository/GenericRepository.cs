@@ -17,6 +17,16 @@ namespace Infrastructure.Repository
         {
             this.context = context;
         }
+
+        public void Add(T entity)
+        {
+            context.Set<T>().Add(entity);
+        }
+
+        public void Delete(T entity)
+        {
+            context.Set<T>().Remove(entity);
+        }
         public async Task<T> GetByIdAsync(int id)
         {
             return await context.Set<T>().FindAsync(id);
@@ -34,7 +44,15 @@ namespace Infrastructure.Repository
 
         public async Task<IReadOnlyList<T>> ListAsync(ISpecification<T> spec)
         {
-            return await ApplySpecification(spec).ToListAsync();
+            var query = ApplySpecification(spec);
+
+            return await query.ToListAsync();
+        }
+
+        public void Update(T entity)
+        {
+            context.Set<T>().Attach(entity);
+            context.Entry(entity).State = EntityState.Modified;
         }
 
         public async Task<int> CountAsync(ISpecification<T> spec)
