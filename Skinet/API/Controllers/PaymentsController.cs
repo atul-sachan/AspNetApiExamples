@@ -5,6 +5,7 @@ using Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Stripe;
 using System;
@@ -20,12 +21,13 @@ namespace API.Controllers
     public class PaymentsController : ControllerBase
     {
         private readonly IPaymentService paymentService;
-        private const string WhSecret = "whsec_EyP6oX8cWkG8pdnUHrzSOWnkoAWRwbco";
+        private readonly string whSecret;
         private readonly ILogger<PaymentsController> logger;
-        public PaymentsController(IPaymentService paymentService, ILogger<PaymentsController> logger)
+        public PaymentsController(IPaymentService paymentService, ILogger<PaymentsController> logger, IConfiguration config)
         {
             this.logger = logger;
             this.paymentService = paymentService;
+            this.whSecret = config.GetSection("StripeSettings:WhSecret").Value;
         }
 
         [Authorize]
@@ -44,7 +46,7 @@ namespace API.Controllers
         {
             var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
 
-            var stripeEvent = EventUtility.ConstructEvent(json, Request.Headers["Stripe-Signature"], WhSecret);
+            var stripeEvent = EventUtility.ConstructEvent(json, Request.Headers["Stripe-Signature"], whSecret);
 
             PaymentIntent intent;
             Core.Entities.OrderAggregate.Order order;
