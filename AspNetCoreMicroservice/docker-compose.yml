@@ -52,11 +52,35 @@ services:
       context: .
       dockerfile: src/Services/Ordering/Ordering.API/Dockerfile
 
+  ocelotapigw:
+    image: ${DOCKER_REGISTRY-}ocelotapigw
+    build:
+      context: .
+      dockerfile: src/ApiGateways/OcelotApiGw/Dockerfile
+
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.9.2
 
   kibana:
     image: docker.elastic.co/kibana/kibana:7.9.2
+
+  shopping.aggregator:
+    image: ${DOCKER_REGISTRY-}shoppingaggregator
+    build:
+      context: .
+      dockerfile: src/ApiGateways/Shopping.Aggregator/Dockerfile
+
+  aspnetrunbasics:
+    image: ${DOCKER_REGISTRY-}aspnetrunbasics
+    build:
+      context: .
+      dockerfile: src/WebApps/AspnetRunBasics/Dockerfile
+
+  webstatus:
+    image: ${DOCKER_REGISTRY-}webstatus
+    build:
+      context: .
+      dockerfile: src/WebApps/WebStatus/Dockerfile
 
 volumes:
   mongo_data:
@@ -64,5 +88,9 @@ volumes:
   postgres_data:
   pgadmin_data:
   elasticsearch-data:
+
+
+
+
 
 
